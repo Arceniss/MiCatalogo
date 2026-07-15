@@ -1460,6 +1460,21 @@
         </div>
     </div>
 
+    <!-- Modal Personalizado para Instalar PWA -->
+    <div class="modal-overlay centered-modal" id="installModal" style="z-index: 400;">
+        <div class="modal-content confirm-box">
+            <div style="font-size: 40px; margin-bottom: 10px;">📲</div>
+            <h3 style="color: var(--primary); margin-bottom:10px;">¡Lleva el Catálogo contigo!</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+                Instala nuestra App en tu pantalla de inicio para acceder al instante, comprar más rápido y no perder nuestro enlace.
+            </p>
+            <div class="confirm-actions">
+                <button class="btn-cancel" onclick="document.getElementById('installModal').classList.remove('show')">Quizás después</button>
+                <button class="btn-submit" id="btnInstallConfirm">Instalar App</button>
+            </div>
+        </div>
+    </div>
+
     <footer>Catálogo Web creado por <span onclick="document.getElementById('promoModal').classList.add('show')"
             style="color: var(--promo-purple); cursor:pointer; letter-spacing: 1px;">
             Digit<span style="color: var(--promo-purple); font-weight: 800;">ALS</span></span> | © 2026</footer>
@@ -1983,6 +1998,39 @@
             try { await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "deleteCategory", nombre: name }), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: "follow" }); await loadProducts(); }
             catch (e) { console.error(e); } finally { btn.innerText = "Sí, Eliminar"; btn.disabled = false; }
         }
+
+        // --- LÓGICA DE INSTALACIÓN PWA (ANDROID/CHROME) ---
+        let deferredPrompt;
+        const installModal = document.getElementById('installModal');
+        const btnInstallConfirm = document.getElementById('btnInstallConfirm');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Evita que Chrome muestre el aviso nativo automáticamente
+            e.preventDefault();
+            // Guarda el evento para usarlo luego
+            deferredPrompt = e;
+            
+            // Muestra tu modal personalizado después de 2 segundos para no asustar al usuario de golpe
+            setTimeout(() => {
+                installModal.classList.add('show');
+            }, 2000);
+        });
+
+        // Cuando el cliente toca "Instalar App" en tu modal
+        btnInstallConfirm.addEventListener('click', async () => {
+            installModal.classList.remove('show');
+            if (deferredPrompt) {
+                // Lanza el aviso nativo del sistema
+                deferredPrompt.prompt();
+                // Espera a ver qué responde el usuario
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('El cliente aceptó la instalación');
+                }
+                // Limpia la variable
+                deferredPrompt = null;
+            }
+        });
 
         window.onload = loadProducts;
     </script>
