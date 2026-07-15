@@ -1088,6 +1088,22 @@
             border-top: 0.5px solid var(--text-muted);
         }
     </style>
+
+    <link rel="manifest" href="manifest.json">
+    
+    <meta name="theme-color" content="#2B2D42">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registrado con éxito', reg))
+                    .catch(err => console.error('Error al registrar el Service Worker', err));
+            });
+        }
+    </script>
 </head>
 
 <body class="modo-cliente">
