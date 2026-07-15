@@ -1,14 +1,19 @@
 {
     "name": "Mi Catálogo de Productos",
     "short_name": "Catálogo",
-    "start_url": "./index.html",
+    "start_url": "./",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#2B2D42",
     "orientation": "portrait",
     "icons": [
         {
-            "src": "https: //ibb.co/s9Z2XYq1",
+            "src": "https://i.ibb.co/YBx3Vshd/icono.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://i.ibb.co/YBx3Vshd/icono.png",
             "sizes": "512x512",
             "type": "image/png"
         }
