@@ -1,6 +1,6 @@
 {
-    "name": "MICHAQUETAS",
-    "short_name": "MICHAQUETAS",
+    "name": "MiCatálogo",
+    "short_name": "MiCatálogo",
     "start_url": "./",
     "display": "standalone",
     "background_color": "#ffffff",
