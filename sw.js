@@ -1,4 +1,4 @@
-const CACHE_NAME = 'micatalogo-cache-v1.01';
+const CACHE_NAME = 'micatalogo-cache-v1.02';
 const assets = [
   './',
   './index.html',
