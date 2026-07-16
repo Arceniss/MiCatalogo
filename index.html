@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <title>MICHAQUETAS</title>
+    <title>MiCatálogo</title>
 
     <link rel="icon" href="data:,">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1242,10 +1242,8 @@
                     <div class="file-upload-wrapper">
                         <img id="previewImg" src="" title="Tocar para cambiar">
                         <div id="uploadText" class="upload-btns-container">
-                            <button type="button" class="btn-upload-action"
-                                onclick="document.getElementById('prodImgCam').click()">📸 CÁMARA</button>
-                            <button type="button" class="btn-upload-action gal"
-                                onclick="document.getElementById('prodImgGal').click()">🖼️ GALERÍA</button>
+                            <label for="prodImgCam" class="btn-upload-action" style="display: flex; justify-content: center; align-items: center; box-sizing: border-box; cursor: pointer;">📸 CÁMARA</label>
+                            <label for="prodImgGal" class="btn-upload-action gal" style="display: flex; justify-content: center; align-items: center; box-sizing: border-box; cursor: pointer;">🖼️ GALERÍA</label>
                         </div>
                         <input type="file" id="prodImgCam" accept="image/*" capture="environment" style="display:none;">
                         <input type="file" id="prodImgGal" accept="image/*" style="display:none;">
@@ -1284,13 +1282,13 @@
                     </div>
                 </form>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-bottom: 24px; padding-bottom: 24px;">
-                <button type="button" id="btnEliminar" class="btn-delete" style="width: 100%;"
+            <div style="display: flex; gap: 10px; width: 100%; margin-bottom: 24px; padding-bottom: 24px;">
+                <button type="button" id="btnEliminar" class="btn-delete" style="flex: 1;"
                     onclick="document.getElementById('deleteModal').classList.add('show')">
                     Borrar
                 </button>
                 
-                <button type="submit" form="productForm" id="btnGuardar" class="btn-submit" style="width: 100%;">
+                <button type="submit" form="productForm" id="btnGuardar" class="btn-submit" style="flex: 1;">
                     Guardar
                 </button>
             </div>
