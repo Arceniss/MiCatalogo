@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <title>MiChaquetas</title>
+    <title>El Séptimo Anillo</title>
 
     <link rel="icon" href="data:,">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1147,13 +1147,21 @@
     <header>
         <div class="brand-header">
             <div class="brand-info">
-                <!-- Se cambió el nombre a logo.png por problemas de codificación de lectura local en móviles -->
                 <h1>MICH<span>AQUETAS</span></h1>
                 <p id="headerSubtitle">Chaquetas y Suéteres escolares</p>
             </div>
 
             <!-- CONTROLES SUPERIORES -->
             <div class="top-controls">
+                <!-- Botón de Vista Previa (Oculto por defecto, se activa solo para el Admin) -->
+                <button id="btnToggleMode" class="btn-header-icon" onclick="toggleClientAdminView()" style="display: none;">
+                    <svg id="toggleModeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </button>
+                
                 <button class="btn-header-icon" onclick="openShareModal()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                         stroke-linecap="round" stroke-linejoin="round">
@@ -1165,7 +1173,7 @@
                     </svg>
                 </button>
             </div>
-        </div>
+        </div> <!-- ESTE ES EL DIV FALTANTE QUE SE DEBE AGREGAR -->
 
         <div class="nav-row" id="navNormal">
             <button class="search-trigger-btn" onclick="toggleSearch(true)">
@@ -1572,6 +1580,10 @@
             document.body.classList.remove('modo-cliente');
             document.body.classList.add('modo-admin');
             document.getElementById('headerSubtitle').innerText = "PANEL DE ADMINISTRACIÓN";
+            
+            // Muestra el botón de alternar vista únicamente al administrador
+            const btnToggle = document.getElementById('btnToggleMode');
+            if (btnToggle) btnToggle.style.display = "flex";
         }
 
         // 4. VARIABLES GLOBALES Y UTILIDADES
@@ -1705,15 +1717,24 @@
             grid.innerHTML = "";
             const searchVal = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : "";
 
+            // Determina la visualización en base a la clase actual del body
+            const isVisualizingAsAdmin = document.body.classList.contains('modo-admin');
+
             const filtered = products.filter(p => {
                 const matchCat = (currentCategory === 'todas' || p.cat === currentCategory);
-                if (!IS_ADMIN) {
-                    return p.available && matchCat && (p.name.toLowerCase().includes(searchVal) || p.desc.toLowerCase().includes(searchVal));
+                
+                // Filtro de búsqueda por texto (Se conserva y aplica para ambos modos)
+                const matchSearch = p.name.toLowerCase().includes(searchVal) || p.desc.toLowerCase().includes(searchVal);
+                
+                if (!isVisualizingAsAdmin) {
+                    // Filtros exclusivos del cliente (oculta productos inactivos)
+                    return p.available && matchCat && matchSearch;
                 } else {
+                    // Filtros exclusivos de administración (muestra visibles/ocultos según el FAB selector)
                     let matchVis = true;
                     if (visibilityState === 1) matchVis = (p.available === true);
                     if (visibilityState === 2) matchVis = (p.available === false);
-                    return matchCat && matchVis;
+                    return matchCat && matchVis && matchSearch;
                 }
             });
 
@@ -1727,16 +1748,17 @@
             `;
 
             if (filtered.length === 0) {
-                if (IS_ADMIN) grid.innerHTML = `<div style="grid-column: span 2; text-align:center; padding: 40px; color:var(--text-muted); font-weight:600;">No hay productos.</div>`;
+                if (isVisualizingAsAdmin) grid.innerHTML = `<div style="grid-column: span 2; text-align:center; padding: 40px; color:var(--text-muted); font-weight:600;">No hay productos.</div>`;
                 else grid.innerHTML = tarjetaPublicidad;
                 return;
             }
 
             filtered.forEach((p, index) => {
                 const safeId = `prod-card-${p.id}`;
-                if (!IS_ADMIN && index === 2) grid.innerHTML += tarjetaPublicidad;
+                if (!isVisualizingAsAdmin && index === 2) grid.innerHTML += tarjetaPublicidad;
 
-                if (IS_ADMIN) {
+                if (isVisualizingAsAdmin) {
+                    // Tarjeta de Edición (Administrador)
                     const hiddenClass = !p.available ? "hidden-prod" : "";
                     const badge = !p.available ? `<div class="badge-hidden">Oculto</div>` : "";
                     grid.innerHTML += `
@@ -1754,6 +1776,7 @@
                         </div>
                     `;
                 } else {
+                    // Tarjeta de Compra (Cliente)
                     const showAddBtn = p.qty === 0 ? "flex" : "none";
                     const showStepper = p.qty > 0 ? "flex" : "none";
                     const isSelected = p.qty > 0 ? "selected" : "";
@@ -1778,7 +1801,7 @@
                 }
             });
 
-            if (!IS_ADMIN && filtered.length < 3) grid.innerHTML += tarjetaPublicidad;
+            if (!isVisualizingAsAdmin && filtered.length < 3) grid.innerHTML += tarjetaPublicidad;
         }
 
         // --- ADMINISTRADOR (Visibility y Formulario) ---
@@ -1999,7 +2022,7 @@
 
         function renderCartModal() {
             const list = document.getElementById('ticketList'); list.innerHTML = ""; let total = 0;
-            const cartItems = products.filter(p => p.qty > 0);
+            const cartItems = products.qtyfilter(p => p.qty > 0);
             if (cartItems.length === 0) { closeCartModal(); return; }
             cartItems.forEach(p => {
                 const sub = p.qty * p.price; total += sub;
@@ -2105,6 +2128,32 @@
             categories = categories.filter(c => c !== name); renderCategoryManagerList(); renderCategoriesUI(); document.getElementById('confirmDeleteCategoryModal').classList.remove('show');
             try { await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "deleteCategory", nombre: name, shop: SHOP_ID }), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: "follow" }); await loadProducts(); }
             catch (e) { console.error(e); } finally { btn.innerText = "Sí, Eliminar"; btn.disabled = false; }
+        }
+
+        function toggleClientAdminView() {
+            const body = document.body;
+            const icon = document.getElementById('toggleModeIcon');
+            const subtitle = document.getElementById('headerSubtitle');
+            
+            if (body.classList.contains('modo-admin')) {
+                // Cambiar a vista de cliente
+                body.classList.remove('modo-admin');
+                body.classList.add('modo-cliente');
+                if (subtitle) subtitle.innerText = "VISTA PREVIA DEL CLIENTE";
+                // Icono Ojo Tachado (Volver al panel admin)
+                if (icon) icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
+            } else {
+                // Volver al panel de edición del administrador
+                body.classList.remove('modo-cliente');
+                body.classList.add('modo-admin');
+                if (subtitle) subtitle.innerText = "PANEL DE ADMINISTRACIÓN";
+                // Icono Ojo Abierto (Ir a vista cliente)
+                if (icon) icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+            }
+            
+            // Volvemos a renderizar los productos y actualizar el carrito para que se apliquen los controles adecuados
+            renderProducts();
+            updateCartBar();
         }
 
         // --- LÓGICA DE INSTALACIÓN PWA (ANDROID/CHROME) ---
