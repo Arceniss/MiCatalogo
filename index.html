@@ -1562,9 +1562,17 @@
         // 1. TUS CREDENCIALES
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyU2rYvLm_xhta_k-rXfJ-22l8tE4yKVgStBWguYFxDjG5MPY1yGKXB5eLjdsWIAGw/exec";
 
-        // 2. MULTI-EMPRENDEDOR: leer ?shop= de la URL
+        // 2. MULTI-EMPRENDEDOR: leer ?shop= de la URL y guardarlo
         const _urlParams = new URLSearchParams(window.location.search);
-        const SHOP_ID = _urlParams.get('shop') || null;
+        let SHOP_ID = _urlParams.get('shop');
+
+        if (SHOP_ID) {
+            // Si el ID viene en la URL, lo guardamos en la memoria del dispositivo
+            localStorage.setItem('tienda_guardada', SHOP_ID);
+        } else {
+            // Si no viene en la URL (porque abrió la App instalada), lo recuperamos
+            SHOP_ID = localStorage.getItem('tienda_guardada');
+        }
 
         window.LINK_CLIENTES = window.location.href.split('?')[0] + (SHOP_ID ? `?shop=${SHOP_ID}` : '');
 
@@ -2022,7 +2030,7 @@
 
         function renderCartModal() {
             const list = document.getElementById('ticketList'); list.innerHTML = ""; let total = 0;
-            const cartItems = products.qtyfilter(p => p.qty > 0);
+            const cartItems = products.filter(p => p.qty > 0); // Corrección: "filter" en lugar de "qtyfilter"
             if (cartItems.length === 0) { closeCartModal(); return; }
             cartItems.forEach(p => {
                 const sub = p.qty * p.price; total += sub;
