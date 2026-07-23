@@ -1,0 +1,21 @@
+{
+    "name": "MICHaquetas",
+    "short_name": "MICHaquetas",
+    "start_url": "./",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#2B2D42",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "https://i.ibb.co/YBx3Vshd/icono.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://i.ibb.co/YBx3Vshd/icono.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
